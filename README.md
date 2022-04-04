@@ -1,7 +1,3 @@
-# Micawber Boilerplate
+# Tweetrator
 
-Micawber is a Sveltekit boilerplate includes Tailwindcss, Postcss, Autoprefixer and Svelte-Meta-Tags.
-
-## Setup
-npm install <br>
-npm run dev
+Tweetrator is a generator website to create fake tweets.
