@@ -1,16 +1,22 @@
 <script>
 	import Modal from './Modal.svelte';
 	import { hasOpen, date, time } from '../stores/modalStore';
+	import * as htmlToImage from 'html-to-image';
+	import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
+	import { Notyf } from 'notyf';
+	import 'notyf/notyf.min.css';
 
 	export let theme = 'light';
-	export let fontFamily = 'inter';
 
 	let photoSrc = '/img/default.png',
 		classes = 'bg-white text-black',
+		iconsColor = '#0ea5e9',
 		dropupOpened = false,
 		imageSrc = '',
 		factChecked = false,
-		verifiedBadge = false;
+		verifiedBadge = false,
+		tweetCardEl,
+		hasDownloaded = false;
 
 	const selectedPhoto = (e) => {
 		let photo = e.target.files[0];
@@ -34,21 +40,59 @@
 
 	$: if (theme === 'light') {
 		classes = 'bg-white text-black border-gray-200';
+		iconsColor = '#0ea5e9';
 	} else if (theme === 'dim') {
 		classes = 'bg-dim text-white border-gray-500';
+		iconsColor = '#fff';
 	} else {
 		classes = 'bg-black text-white border-gray-500';
+		iconsColor = '#fff';
 	}
+
+	const generateToImage = () => {
+		hasDownloaded = true;
+		htmlToImage
+			.toJpeg(tweetCardEl)
+			.then((dataUrl) => {
+				let link = document.createElement('a');
+				link.download = 'tweetrator-tweet.jpeg';
+				link.href = dataUrl;
+				link.click();
+				hasDownloaded = false;
+			})
+			.catch((err) => {
+				console.error(err);
+			})
+			.finally(() => {
+				const notyf = new Notyf({
+					duration: 2000,
+					position: {
+						x: 'right',
+						y: 'bottom'
+					},
+					types: [
+						{
+							type: 'success',
+							background: '#0891b2'
+						}
+					],
+					dismissible: true
+				});
+				notyf.success("Tweet's image has been downloaded.");
+			});
+	};
 </script>
 
-<div class={`p-4 border-2 rounded-md ${classes} font-${fontFamily}`} id="tweet-card">
+<div class={`p-4 border-2 rounded-md ${classes} mb-4`} id="tweet-card" bind:this={tweetCardEl}>
 	<!-- svelte-ignore a11y-img-redundant-alt -->
 	<div class="flex justify-between mb-5">
 		<div class="flex items-center">
 			<label for="photo-input">
 				<img
 					src={photoSrc}
-					class="rounded-full w-12 h-12 border-2 border-dashed p-0.5 cursor-pointer"
+					class={`rounded-full w-12 h-12 ${
+						!hasDownloaded ? 'border-2 border-dashed p-0.5' : ''
+					} cursor-pointer`}
 					alt="User's photo"
 				/>
 				<input
@@ -62,19 +106,25 @@
 			<div class="flex-column ml-3">
 				<div class="flex items-center">
 					<p
-						class="font-bold border-2 border-dashed outline-none"
+						class={`font-bold ${!hasDownloaded ? 'border-2 border-dashed' : ''} outline-none`}
 						contenteditable="true"
 						spellcheck="false"
 					>
 						Name
 					</p>
 					{#if verifiedBadge}
-						<i class="fas fa-fw fa-badge-check ml-1 text-cyan-600" />
+						<svg fill={iconsColor} width="22" viewBox="0 0 24 24"
+							><g
+								><path
+									d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .494.083.964.237 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z"
+								/></g
+							></svg
+						>
 					{/if}
 				</div>
 				<p class="text-gray-500">
 					@<span
-						class="border-2 border-dashed outline-none"
+						class={`${!hasDownloaded ? 'border-2 border-dashed' : ''} outline-none`}
 						contenteditable="true"
 						spellcheck="false">username</span
 					>
@@ -83,17 +133,27 @@
 		</div>
 		<div class="relative">
 			<button
-				class="text-xl text-gray-500 self-start border-2 border-dashed border-gray-300"
+				class={`text-xl text-gray-500 self-start ${
+					!hasDownloaded ? 'border-2 border-dashed' : ''
+				} border-gray-300`}
 				on:click={() => (dropupOpened = !dropupOpened)}
 			>
-				<i class="far fa-fw fa-ellipsis-h" />
+				<svg viewBox="0 0 24 24" fill="#9ca3af" width="22"
+					><g
+						><circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle
+							cx="19"
+							cy="12"
+							r="2"
+						/></g
+					></svg
+				>
 			</button>
 			<ul
-				class={`absolute top-12 bg-white shadow-lg transition-all duration-300 ease-linear ${
+				class={`absolute top-12 bg-white shadow-lg transition-all duration-300 ease-linear text-black ${
 					dropupOpened
 						? 'opacity-full pointer-events-auto translate-y-0'
 						: 'opacity-0 pointer-events-none translate-y-10'
-				} left-0 -translate-x-36 rounded-md w-48`}
+				} left-0 -translate-x-36 rounded-md w-48 py-4`}
 				id="dropup-menu"
 			>
 				<li class="mb-3 px-3 py-1 hover:bg-gray-200">
@@ -111,7 +171,7 @@
 						on:change={(e) => selectedImage(e)}
 					/>
 				</li>
-				<li class="mb-3 px-3 py-1 hover:bg-gray-200">
+				<li class="px-3 py-1 hover:bg-gray-200">
 					<button type="button" on:click={() => (factChecked = !factChecked)}
 						>Fact check warning</button
 					>
@@ -120,7 +180,7 @@
 		</div>
 	</div>
 	<p
-		class="text-xl mb-5 border-2 border-dashed outline-none"
+		class={`text-xl mb-5 ${!hasDownloaded ? 'border-2 border-dashed' : ''} outline-none`}
 		contenteditable="true"
 		spellcheck="false"
 	>
@@ -128,7 +188,7 @@
 	</p>
 	{#if factChecked}
 		<div id="debunk" class="flex items-center pb-1.5 border-b border-inherit">
-			<svg fill="#0991B2" width="26" viewBox="0 0 24 24"
+			<svg fill="#0ea5e9" width="26" viewBox="0 0 24 24"
 				><g
 					><circle cx="12.025" cy="16.437" r="1.281" /><path
 						d="M14.39 7.194c-.094-.127-.242-.2-.4-.2h-3.928c-.158 0-.307.073-.4.2-.096.126-.125.29-.08.442l1.814 6.098c.063.212.258.357.48.357h.298c.222 0 .416-.145.48-.356l1.813-6.098c.047-.152.017-.316-.077-.442z"
@@ -138,7 +198,9 @@
 				></svg
 			>
 			<p
-				class="text-cyan-600 text-sm ml-2 border-2 border-dashed outline-none"
+				class={`text-cyan-600 text-sm ml-2 ${
+					!hasDownloaded ? 'border-2 border-dashed' : ''
+				} outline-none`}
 				contenteditable="true"
 			>
 				This fact is disputed
@@ -149,7 +211,9 @@
 	{#if imageSrc}
 		<label for="image-input" class="cursor-pointer">
 			<img
-				class="rounded-2xl border-2 border-dashed p-1 border-inherit mb-4 w-full"
+				class={`rounded-2xl ${
+					!hasDownloaded ? 'border-2 border-dashed' : ''
+				} p-1 border-inherit mb-4 w-full`}
 				src={imageSrc}
 				alt="User's image"
 				on:click={(e) => selectedImage(e)}
@@ -157,7 +221,9 @@
 		</label>
 	{/if}
 	<p class={`text-gray-500 py-3 border-b border-inherit`}>
-		<span class="cursor-pointer border-2 border-dashed" on:click={() => hasOpen.set(true)}
+		<span
+			class={`cursor-pointer ${!hasDownloaded ? 'border-2 border-dashed' : ''}`}
+			on:click={() => hasOpen.set(true)}
 			>{new Date(`${$date} ${$time}`).toLocaleTimeString('en-us', {
 				hour12: true,
 				hour: '2-digit',
@@ -169,8 +235,10 @@
 			})}</span
 		>
 		· Twitter for
-		<span class="border-2 border-dashed outline-none" contenteditable="true" spellcheck="false"
-			>Android</span
+		<span
+			class={`${!hasDownloaded ? 'border-2 border-dashed' : ''} outline-none`}
+			contenteditable="true"
+			spellcheck="false">Android</span
 		>
 	</p>
 	<Modal />
@@ -178,27 +246,27 @@
 		<ul class="flex">
 			<li class="mr-8 text-gray-500">
 				<span
-					class={`font-bold mr-1 outline-none text-${
-						theme === 'light' ? 'black' : 'white'
-					} border-2 border-dashed`}
+					class={`font-bold mr-1 outline-none text-${theme === 'light' ? 'black' : 'white'} ${
+						!hasDownloaded ? 'border-2 border-dashed' : ''
+					}`}
 					contenteditable="true"
 					spellcheck="false">0</span
 				> Retweets
 			</li>
 			<li class="mr-8 text-gray-500">
 				<span
-					class={`font-bold mr-1 outline-none text-${
-						theme === 'light' ? 'black' : 'white'
-					} border-2 border-dashed`}
+					class={`font-bold mr-1 outline-none text-${theme === 'light' ? 'black' : 'white'} ${
+						!hasDownloaded ? 'border-2 border-dashed' : ''
+					}`}
 					contenteditable="true"
 					spellcheck="false">0</span
 				> Quote Tweets
 			</li>
 			<li class="text-gray-500">
 				<span
-					class={`font-bold mr-1 outline-none text-${
-						theme === 'light' ? 'black' : 'white'
-					} border-2 border-dashed`}
+					class={`font-bold mr-1 outline-none text-${theme === 'light' ? 'black' : 'white'} ${
+						!hasDownloaded ? 'border-2 border-dashed' : ''
+					}`}
 					contenteditable="true"
 					spellcheck="false">0</span
 				> Likes
@@ -246,3 +314,10 @@
 		</li>
 	</ul>
 </div>
+<button
+	class="text-white bg-cyan-600 hover:bg-cyan-800 px-5 py-2 rounded-full font-bold"
+	on:click={generateToImage}
+>
+	<i class="far fa-download mr-3" />
+	Generate to image
+</button>

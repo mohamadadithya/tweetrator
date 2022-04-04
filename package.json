@@ -27,6 +27,7 @@
   "type": "module",
   "dependencies": {
     "html-to-image": "^1.9.0",
+    "notyf": "^3.10.0",
     "svelte-meta-tags": "^2.4.0"
   }
 }

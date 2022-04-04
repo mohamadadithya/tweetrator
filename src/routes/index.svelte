@@ -4,10 +4,7 @@
 	import TweetCard from '../components/TweetCard.svelte';
 
 	const themes = ['light', 'dim', 'dark'];
-	const fonts = ['montserrat', 'inter', 'poppins'];
-
-	let selectedTheme = 'light',
-		selectedFont = 'inter';
+	let selectedTheme = 'light';
 </script>
 
 <MetaTags
@@ -29,9 +26,20 @@
 	]}
 />
 
-<section class="pt-24 md:pt-36 py-10">
-	<Container classes="grid md:grid-cols-2">
+<section class="pt-24 md:pt-36 pb-8">
+	<Container classes="grid lg:grid-cols-2 gap-6 lg:gap-8">
 		<div>
+			<h1 class="text-3xl font-bold mb-5">How to Use</h1>
+			<ul class="list-disc list-inside mb-6">
+				<li class="mb-2">
+					Everything inside a <span class="border-2 border-dashed">dashed border</span> is editable.
+					Click on one to edit it.
+				</li>
+				<li>
+					Clicking on a Tweet's <i class="far fa-fw fa-ellipsis-h border-2 border-dashed" /> icon will
+					bring up additional options, such as adding an image and toggling the verified badge.
+				</li>
+			</ul>
 			<h1 class="text-3xl font-bold mb-5">Configuration</h1>
 			<form class="mb-6">
 				<p class="mb-3 font-bold">Theme</p>
@@ -50,31 +58,22 @@
 						</label>
 					{/each}
 				</div>
-				<p class="mb-3 font-bold">Font Style</p>
-				<div class="mb-3 accent-cyan-600">
-					{#each fonts as font}
-						<label class="mr-4 capitalize" for={font}>
-							<input
-								type="radio"
-								class="mr-2"
-								name="font-style"
-								id={font}
-								value={font}
-								bind:group={selectedFont}
-							/>
-							{font}
-						</label>
-					{/each}
-				</div>
 			</form>
-			<button class="text-white bg-cyan-600 hover:bg-cyan-800 px-5 py-2 rounded-lg font-bold">
-				<i class="far fa-download mr-3" />
-				Generate image
-			</button>
 		</div>
-		<div class="mt-10 md:mt-0">
+		<div>
 			<h2 class="text-3xl font-bold mb-5">Preview</h2>
-			<TweetCard fontFamily={selectedFont} theme={selectedTheme} />
+			<TweetCard theme={selectedTheme} />
 		</div>
 	</Container>
+	<footer class="mt-16">
+		<Container>
+			<p class="text-sm">
+				&copy; 2022 Tweetrator | <a
+					class="font-bold"
+					href="https://m-adithya.my.id"
+					aria-label="Author">Mohamad Adithya</a
+				>
+			</p>
+		</Container>
+	</footer>
 </section>
