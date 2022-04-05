@@ -16,7 +16,7 @@
 </script>
 
 <div
-	class="fixed transition-all duration-300 ease-in-out {$hasOpen
+	class="fixed z-20 transition-all duration-300 ease-in-out max-w-fit {$hasOpen
 		? 'translate-y-0 opacity-1'
 		: '-translate-y-full opacity-0'} bg-white p-4 rounded-md top-3 left-2/4 right-2/4 -translate-x-1/2 w-96 shadow-md"
 >

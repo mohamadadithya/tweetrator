@@ -5,6 +5,7 @@
 	import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
 	import { Notyf } from 'notyf';
 	import 'notyf/notyf.min.css';
+	import { numFormatter } from '../helper/numFormatter';
 
 	export let theme = 'light';
 
@@ -16,6 +17,9 @@
 		factChecked = false,
 		verifiedBadge = false,
 		tweetCardEl,
+		retweets = '0',
+		quoteTweets = '0',
+		likes = '0',
 		hasDownloaded = false;
 
 	const selectedPhoto = (e) => {
@@ -52,7 +56,7 @@
 	const generateToImage = () => {
 		hasDownloaded = true;
 		htmlToImage
-			.toJpeg(tweetCardEl)
+			.toJpeg(tweetCardEl, { pixelRatio: 1.5 })
 			.then((dataUrl) => {
 				let link = document.createElement('a');
 				link.download = 'tweetrator-tweet.jpeg';
@@ -81,9 +85,21 @@
 				notyf.success("Tweet's image has been downloaded.");
 			});
 	};
+
+	const randomizeActionCount = () => {
+		let randomNumber = Math.floor(Math.random() * 100000) + 130;
+		let formattedNumber = numFormatter(randomNumber);
+		retweets = formattedNumber;
+		quoteTweets = formattedNumber;
+		likes = formattedNumber;
+	};
 </script>
 
-<div class={`p-4 border-2 rounded-md ${classes} mb-4`} id="tweet-card" bind:this={tweetCardEl}>
+<div
+	class={`p-4 ${!hasDownloaded ? 'border-2' : ''} ${classes} font-inter`}
+	id="tweet-card"
+	bind:this={tweetCardEl}
+>
 	<!-- svelte-ignore a11y-img-redundant-alt -->
 	<div class="flex justify-between mb-5">
 		<div class="flex items-center">
@@ -104,7 +120,7 @@
 				/>
 			</label>
 			<div class="flex-column ml-3">
-				<div class="flex items-center">
+				<div class="flex items-center text-base">
 					<p
 						class={`font-bold ${!hasDownloaded ? 'border-2 border-dashed' : ''} outline-none`}
 						contenteditable="true"
@@ -149,7 +165,7 @@
 				>
 			</button>
 			<ul
-				class={`absolute top-12 bg-white shadow-lg transition-all duration-300 ease-linear text-black ${
+				class={`absolute top-12 bg-white shadow-lg text-sm md:text-base transition-all duration-300 ease-linear text-black ${
 					dropupOpened
 						? 'opacity-full pointer-events-auto translate-y-0'
 						: 'opacity-0 pointer-events-none translate-y-10'
@@ -180,7 +196,7 @@
 		</div>
 	</div>
 	<p
-		class={`text-xl mb-5 ${!hasDownloaded ? 'border-2 border-dashed' : ''} outline-none`}
+		class={`text-xl mb-3 ${!hasDownloaded ? 'border-2 border-dashed' : ''} outline-none`}
 		contenteditable="true"
 		spellcheck="false"
 	>
@@ -220,7 +236,7 @@
 			/>
 		</label>
 	{/if}
-	<p class={`text-gray-500 py-3 border-b border-inherit`}>
+	<p class={`text-gray-500 py-3 text-xs md:text-base border-b border-inherit`}>
 		<span
 			class={`cursor-pointer ${!hasDownloaded ? 'border-2 border-dashed' : ''}`}
 			on:click={() => hasOpen.set(true)}
@@ -234,32 +250,32 @@
 				year: 'numeric'
 			})}</span
 		>
-		· Twitter for
+		· Twitter
 		<span
 			class={`${!hasDownloaded ? 'border-2 border-dashed' : ''} outline-none`}
 			contenteditable="true"
-			spellcheck="false">Android</span
+			spellcheck="false">for Android</span
 		>
 	</p>
 	<Modal />
-	<div class={`py-4 border-b border-inherit`} id="stats">
+	<div class={`py-4 border-b border-inherit text-xs md:text-base`} id="stats">
 		<ul class="flex">
-			<li class="mr-8 text-gray-500">
+			<li class="mr-4 text-gray-500">
 				<span
 					class={`font-bold mr-1 outline-none text-${theme === 'light' ? 'black' : 'white'} ${
 						!hasDownloaded ? 'border-2 border-dashed' : ''
 					}`}
 					contenteditable="true"
-					spellcheck="false">0</span
+					spellcheck="false">{retweets}</span
 				> Retweets
 			</li>
-			<li class="mr-8 text-gray-500">
+			<li class="mr-4 text-gray-500">
 				<span
 					class={`font-bold mr-1 outline-none text-${theme === 'light' ? 'black' : 'white'} ${
 						!hasDownloaded ? 'border-2 border-dashed' : ''
 					}`}
 					contenteditable="true"
-					spellcheck="false">0</span
+					spellcheck="false">{quoteTweets}</span
 				> Quote Tweets
 			</li>
 			<li class="text-gray-500">
@@ -268,10 +284,18 @@
 						!hasDownloaded ? 'border-2 border-dashed' : ''
 					}`}
 					contenteditable="true"
-					spellcheck="false">0</span
+					spellcheck="false">{likes}</span
 				> Likes
 			</li>
 		</ul>
+		<!-- svelte-ignore a11y-missing-attribute -->
+		{#if !hasDownloaded}
+			<a
+				role="button"
+				class="text-sm mt-4 inline-block text-cyan-600"
+				on:click={randomizeActionCount}>Randomize all <i class="fas fa-fw fa-random" /></a
+			>
+		{/if}
 	</div>
 	<ul class={`flex justify-around py-3 border-b border-inherit`} id="actions">
 		<li>
@@ -315,7 +339,7 @@
 	</ul>
 </div>
 <button
-	class="text-white bg-cyan-600 hover:bg-cyan-800 px-5 py-2 rounded-full font-bold"
+	class="text-white mt-4 bg-cyan-600 hover:bg-cyan-800 px-5 py-2 rounded-full font-bold"
 	on:click={generateToImage}
 >
 	<i class="far fa-download mr-3" />
