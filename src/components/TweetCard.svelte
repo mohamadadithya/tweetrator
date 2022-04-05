@@ -87,11 +87,9 @@
 	};
 
 	const randomizeActionCount = () => {
-		let randomNumber = Math.floor(Math.random() * 100000) + 130;
-		let formattedNumber = numFormatter(randomNumber);
-		retweets = formattedNumber;
-		quoteTweets = formattedNumber;
-		likes = formattedNumber;
+		retweets = numFormatter(Math.floor(Math.random() * 100000) + 130);
+		quoteTweets = numFormatter(Math.floor(Math.random() * 100000) + 130);
+		likes = numFormatter(Math.floor(Math.random() * 100000) + 130);
 	};
 </script>
 
