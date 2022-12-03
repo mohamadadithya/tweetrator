@@ -27,10 +27,10 @@
 />
 
 <section class="pt-24 md:pt-36 pb-8">
-	<Container classes="grid lg:grid-cols-2 gap-6 lg:gap-8">
+	<Container classes="grid items-start lg:grid-cols-2 gap-6 lg:gap-8">
 		<div>
 			<h1 class="text-3xl font-bold mb-5">How to Use</h1>
-			<ul class="list-disc list-inside mb-6">
+			<ul class="list-disc pl-6 mb-6">
 				<li class="mb-2">
 					Everything inside a <span class="border-2 border-dashed">dashed border</span> is editable.
 					Click on one to edit it.
@@ -45,7 +45,7 @@
 				<p class="mb-3 font-bold">Theme</p>
 				<div class="mb-5 accent-cyan-600">
 					{#each themes as theme}
-						<label for={theme} class="mr-4 capitalize">
+						<label for={theme} class="mr-4 capitalize cursor-pointer">
 							<input
 								type="radio"
 								class="mr-2"
@@ -59,13 +59,22 @@
 					{/each}
 				</div>
 			</form>
+			<footer class="mt-16 lg:block hidden">
+				<p class="text-sm">
+					&copy; 2022 Tweetrator | <a
+						class="font-bold"
+						href="https://m-adithya.my.id"
+						aria-label="Author">Mohamad Adithya</a
+					>
+				</p>
+			</footer>
 		</div>
 		<div>
 			<h2 class="text-3xl font-bold mb-5">Preview</h2>
 			<TweetCard theme={selectedTheme} />
 		</div>
 	</Container>
-	<footer class="mt-16">
+	<footer class="mt-16 lg:hidden block">
 		<Container>
 			<p class="text-sm">
 				&copy; 2022 Tweetrator | <a

@@ -2,7 +2,6 @@
 	import Modal from './Modal.svelte';
 	import { hasOpen, date, time } from '../stores/modalStore';
 	import * as htmlToImage from 'html-to-image';
-	import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
 	import { Notyf } from 'notyf';
 	import 'notyf/notyf.min.css';
 	import { numFormatter } from '../helper/numFormatter';
@@ -63,8 +62,7 @@
 				link.href = dataUrl;
 				link.click();
 				hasDownloaded = false;
-			})
-			.catch((err) => {
+			}).catch((err) => {
 				console.error(err);
 			})
 			.finally(() => {
@@ -94,7 +92,7 @@
 </script>
 
 <div
-	class={`p-4 ${!hasDownloaded ? 'border-2' : ''} ${classes} font-inter`}
+	class={`p-4 ${!hasDownloaded ? 'border-2' : ''} aspect-[1/1] md:aspect-[16/8] ${classes} font-inter`}
 	id="tweet-card"
 	bind:this={tweetCardEl}
 >
@@ -163,20 +161,20 @@
 				>
 			</button>
 			<ul
-				class={`absolute top-12 bg-white shadow-lg text-sm md:text-base transition-all duration-300 ease-linear text-black ${
+				class={`absolute top-12 bg-white shadow-xl text-sm md:text-base transition-all duration-300 ease-linear text-black ${
 					dropupOpened
 						? 'opacity-full pointer-events-auto translate-y-0'
 						: 'opacity-0 pointer-events-none translate-y-10'
-				} left-0 -translate-x-36 rounded-md w-48 py-4`}
+				} left-0 -translate-x-36 rounded-xl w-48`}
 				id="dropup-menu"
 			>
-				<li class="mb-3 px-3 py-1 hover:bg-gray-200">
-					<button type="button" on:click={() => (verifiedBadge = !verifiedBadge)}
+				<li>
+					<button class="px-3 py-2.5 hover:bg-gray-200 rounded-t-xl w-full text-left" type="button" on:click={() => (verifiedBadge = !verifiedBadge)}
 						>Verified badge</button
 					>
 				</li>
-				<li class="mb-3 px-3 py-1 hover:bg-gray-200">
-					<label for="image-input" class="cursor-pointer">Add image</label>
+				<li>
+					<label for="image-input" class="cursor-pointer px-3 py-2.5 hover:bg-gray-200 block w-full">Add image</label>
 					<input
 						type="file"
 						class="hidden"
@@ -185,8 +183,8 @@
 						on:change={(e) => selectedImage(e)}
 					/>
 				</li>
-				<li class="px-3 py-1 hover:bg-gray-200">
-					<button type="button" on:click={() => (factChecked = !factChecked)}
+				<li>
+					<button type="button" class="px-3 py-2.5 hover:bg-gray-200 rounded-b-xl block w-full text-left" on:click={() => (factChecked = !factChecked)}
 						>Fact check warning</button
 					>
 				</li>
